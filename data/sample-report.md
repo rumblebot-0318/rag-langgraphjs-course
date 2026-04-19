@@ -1,0 +1,17 @@
+# Quarterly Customer Analysis Report
+
+This document summarizes recent customer activity and sales trends.
+
+## Summary
+
+- Enterprise customers showed stronger repurchase signals than smaller accounts.
+- The most common inquiry topics were pricing, deployment time, and support scope.
+- Customers with higher revenue tended to ask about security, integration, and long-term support.
+- In later-stage negotiations, project timeline and maintenance coverage were frequent decision factors.
+
+## Teaching Notes for RAG
+
+1. PDF documents often contain qualitative context that is not stored in database tables.
+2. Database rows can be turned into short text documents for retrieval.
+3. Combining both sources makes it easier to explain why an answer was produced.
+4. A practical RAG pipeline should show both retrieved evidence and the final answer.

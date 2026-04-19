@@ -42,3 +42,7 @@ RAG는 생각보다 단계가 많다.
 - analyze node
 - answer node
 - end
+
+참고한 `langgraph-js` 레포처럼,
+LangGraph.js는 단순 linear chain보다 state와 node를 명시적으로 보여주기 좋다.
+강의에서는 "상태가 노드를 거치며 어떻게 바뀌는가"를 강조하면 이해가 훨씬 쉬워진다.

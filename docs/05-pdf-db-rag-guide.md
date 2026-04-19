@@ -18,11 +18,20 @@
 5. retrieval
 6. model answer
 
+이 흐름은 참고한 `RAGStudy` 레포의 정석 구조와도 맞닿아 있다.
+즉, loader -> splitter -> embeddings/retriever -> answer 생성 흐름을 먼저 이해하면 된다.
+
 ## 강의용 핵심 메시지
 
 - DB도 결국 검색 가능한 텍스트 문서로 바꿔 쓸 수 있다
 - PDF는 비정형, DB는 정형 데이터다
 - RAG는 서로 다른 소스를 하나의 지식 기반으로 묶는 기술이다
+
+## 교육용 보완 포인트
+
+현재 레포에는 `sample-report.pdf`와 함께 `sample-report.md`, `sample-report.txt`도 같이 둔다.
+이유는 강의 환경이나 GitHub 렌더러에 따라 PDF 미리보기가 불안정할 수 있기 때문이다.
+즉, 수업에서는 PDF 원본과 함께 markdown/text 원본도 같이 보여주는 것이 안전하다.
 
 ## OpenAI / Ollama 비교 설명
 

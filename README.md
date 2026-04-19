@@ -39,6 +39,9 @@ npm install
 - `docs/05-pdf-db-rag-guide.md`
 - `docs/06-implementation-notes.md`
 - `docs/07-repo-setup-guide.md`
+- `docs/08-langgraphjs-code-walkthrough.md`
+- `docs/09-embeddings-guide.md`
+- `docs/10-embedding-models.md`
 - `slides/lecture-outline.md`
 
 ## 예제 코드
@@ -47,6 +50,7 @@ npm install
 - `src/lib/loaders.js`
 - `src/lib/retriever.js`
 - `src/lib/model.js`
+- `src/lib/embeddings.js`
 - `scripts/create-sample-db.js`
 
 실행 예시:
@@ -61,10 +65,14 @@ npm run rag:demo
 
 - `data/sample.db` : 샘플 SQLite DB
 - `data/sample-report.pdf` : 강의용 샘플 PDF
+- `data/sample-report.md` : PDF 원문에 해당하는 markdown 버전
 - `data/sample-report.txt` : PDF에 들어간 내용 참고본
 
 강의할 때는 이 샘플 파일로 바로 retrieval 흐름을 보여준 뒤,
 실제 업무 PDF와 DB로 교체하는 식으로 진행하면 된다.
+
+참고로 일부 GitHub/PDF 렌더러에서 PDF 미리보기가 불안정할 수 있으니,
+수업에서는 `sample-report.md`를 함께 보여주는 것을 추천한다.
 
 ## 레포 목적
 
@@ -81,6 +89,7 @@ npm run rag:demo
 MODEL_PROVIDER=openai
 OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4.1-mini
+OPENAI_EMBED_MODEL=text-embedding-3-small
 ```
 
 ### Ollama 예시
@@ -89,4 +98,5 @@ OPENAI_MODEL=gpt-4.1-mini
 MODEL_PROVIDER=ollama
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 OLLAMA_MODEL=qwen2.5:3b
+OLLAMA_EMBED_MODEL=nomic-embed-text
 ```
