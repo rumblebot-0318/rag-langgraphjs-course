@@ -30,7 +30,118 @@ cd rag-langgraphjs-course
 npm install
 ```
 
-## 강의 자료
+## 바로 샘플 실행하기
+
+아래 순서대로 하면 샘플 DB와 샘플 PDF를 기준으로 바로 흐름을 볼 수 있다.
+
+### 1. 프로젝트 폴더로 이동
+
+```bash
+cd /data/data/com.termux/files/home/.openclaw/workspace/rag-langgraphjs-course
+```
+
+### 2. 패키지 설치
+
+```bash
+npm install
+```
+
+설치되는 주요 패키지:
+- `@langchain/langgraph`
+- `@langchain/openai`
+- `@langchain/ollama`
+- `better-sqlite3`
+- `pdf-parse`
+- `dotenv`
+
+### 3. 환경변수 파일 준비
+
+`.env.example`을 복사해서 `.env`를 만든다.
+
+```bash
+cp .env.example .env
+```
+
+### 4-A. OpenAI로 실행할 경우
+
+`.env`를 열어서 아래처럼 맞춘다.
+
+```env
+MODEL_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4.1-mini
+OPENAI_EMBED_MODEL=text-embedding-3-small
+```
+
+### 4-B. Ollama로 실행할 경우
+
+먼저 Ollama 서버와 모델이 준비되어 있어야 한다.
+
+예시:
+
+```bash
+ollama serve
+ollama pull qwen2.5:3b
+ollama pull nomic-embed-text
+```
+
+그 다음 `.env`를 아래처럼 맞춘다.
+
+```env
+MODEL_PROVIDER=ollama
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=qwen2.5:3b
+OLLAMA_EMBED_MODEL=nomic-embed-text
+```
+
+### 5. 샘플 DB 생성
+
+레포에는 이미 `data/sample.db`가 들어있지만, 다시 만들고 싶다면 아래를 실행한다.
+
+```bash
+npm run db:sample
+```
+
+### 6. 샘플 실행
+
+```bash
+npm run rag:demo
+```
+
+실행하면 대략 이런 흐름으로 동작한다.
+- `data/sample-report.pdf` 읽기
+- `data/sample.db` 읽기
+- PDF와 DB row를 하나의 검색 대상으로 합치기
+- 질문과 관련된 문서 찾기
+- LangGraph.js 그래프로 `retrieve -> answer` 실행
+- OpenAI 또는 Ollama 모델로 최종 답변 생성
+
+### 7. 만약 바로 실행이 안 되면
+
+#### `better-sqlite3` 설치 오류
+환경에 따라 네이티브 빌드 이슈가 날 수 있다.
+이 경우:
+- Node 버전 확인
+- 빌드 도구 확인
+- 또는 `data/sample.db`를 그대로 읽는 경로만 먼저 설명
+
+#### Ollama 연결 실패
+- `ollama serve`가 켜져 있는지 확인
+- `OLLAMA_BASE_URL`이 맞는지 확인
+- 모델을 미리 `pull` 했는지 확인
+
+#### OpenAI 인증 실패
+- `OPENAI_API_KEY`가 올바른지 확인
+- 결제/사용량 제한이 걸려 있지 않은지 확인
+
+## 확인 포인트
+
+샘플 실행에서 꼭 확인할 것은 세 가지다.
+- 어떤 문서가 retrieval 되었는가
+- PDF와 DB가 함께 검색 대상에 들어갔는가
+- 최종 답변이 근거를 바탕으로 생성되었는가
+
+## 문서 구성
 
 - `docs/01-rag-basics.md`
 - `docs/02-openai-api-guide.md`
@@ -42,7 +153,6 @@ npm install
 - `docs/09-embeddings-guide.md`
 - `docs/10-embedding-models.md`
 - `docs/11-sparse-vs-embedding.md`
-- `slides/lecture-outline.md`
 
 ## 예제 코드
 
