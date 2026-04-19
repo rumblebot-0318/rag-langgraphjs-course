@@ -202,6 +202,14 @@ http://127.0.0.1:3000/
 - `OPENAI_API_KEY`가 올바른지 확인
 - 결제/사용량 제한이 걸려 있지 않은지 확인
 
+### 8. MCP 서버 실행
+
+```bash
+npm run mcp:server
+```
+
+MCP 예시 서버는 `sample.db`를 읽어서 patient note 조회용 tool을 제공한다.
+
 ## API 확인 포인트
 
 API 모드에서는 아래를 확인하면 된다.
@@ -230,15 +238,20 @@ API 모드에서는 아래를 확인하면 된다.
 - `docs/10-embedding-models.md`
 - `docs/11-sparse-vs-embedding.md`
 - `docs/12-how-rag-pipeline-is-built.md`
+- `docs/13-api-usage.md`
+- `docs/14-mcp-server-guide.md`
+- `docs/15-how-to-build-an-mcp-server.md`
 
 ## 예제 코드
 
 - `src/langgraph-rag-demo.js`
+- `src/api-server.js`
 - `src/lib/loaders.js`
 - `src/lib/retriever.js`
 - `src/lib/model.js`
 - `src/lib/embeddings.js`
 - `scripts/create-sample-db.js`
+- `mcp/patient-mcp-server.js`
 
 실행 예시:
 
