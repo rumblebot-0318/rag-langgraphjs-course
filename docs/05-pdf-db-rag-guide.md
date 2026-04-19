@@ -29,9 +29,8 @@
 
 ## 보완 메모
 
-현재 레포에는 `sample-report.pdf`와 함께 `sample-report.md`, `sample-report.txt`도 같이 둔다.
-이유는 GitHub 렌더러나 일부 환경에서 PDF 미리보기가 불안정할 수 있기 때문이다.
-PDF 원본과 함께 markdown/text 원본도 같이 두는 편이 안전하다.
+현재 레포의 기본 샘플은 `sample-report.txt`다.
+같은 내용의 `sample-report.md`도 참고용으로 두고, `sample-report.pdf`는 선택적으로 PDF 파싱을 시험할 때만 쓰는 보조 파일로 남겨둔다.
 
 ## OpenAI / Ollama 비교 설명
 

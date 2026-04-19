@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { StateGraph, END } from '@langchain/langgraph';
 
 import { loadKnowledgeDocuments } from './lib/loaders.js';
-import { createEmbeddings } from './lib/embeddings.js';
+import { buildChunkedVectorStore, searchChunkedVectorStore } from './lib/vector-store.js';
 import { createChatModel } from './lib/model.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,48 +21,26 @@ const GraphState = {
   answer: 'string',
 };
 
-function cosine(a, b) {
-  let dot = 0;
-  let na = 0;
-  let nb = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    na += a[i] * a[i];
-    nb += b[i] * b[i];
-  }
-  return dot / (Math.sqrt(na) * Math.sqrt(nb) || 1);
-}
-
-async function buildEmbeddingIndex() {
-  const docs = await loadKnowledgeDocuments(sourceDir, dbPath);
-  const embeddings = createEmbeddings();
-  const vectors = await embeddings.embedDocuments(docs.map((doc) => doc.text));
-  return docs.map((doc, i) => ({ ...doc, vector: vectors[i] }));
-}
-
 async function main() {
-  const index = await buildEmbeddingIndex();
-  const model = createChatModel();
-  const embeddings = createEmbeddings();
+  const provider = process.env.MODEL_PROVIDER || 'openai';
+  const docs = await loadKnowledgeDocuments(sourceDir, dbPath);
+  const { vectorStore, chunks } = await buildChunkedVectorStore(docs, { provider });
+  const model = createChatModel({ provider });
 
   const workflow = new StateGraph({ channels: GraphState });
 
   workflow.addNode('retrieve', async (state) => {
-    const q = await embeddings.embedQuery(state.question);
-    const docs = index
-      .map((doc) => ({ ...doc, score: cosine(q, doc.vector) }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, state.topK || 4);
-    return { docs };
+    const retrieved = await searchChunkedVectorStore(vectorStore, state.question, state.topK || 4);
+    return { docs: retrieved };
   });
 
   workflow.addNode('generateAnswer', async (state) => {
     const context = state.docs
-      .map((doc, i) => `[${i + 1}] (${doc.source})\n${doc.text.slice(0, 400)}`)
+      .map((doc, i) => `[${i + 1}] (${doc.source}#chunk-${doc.chunkIndex})\n${doc.text}`)
       .join('\n\n');
 
     const prompt = [
-      '다음 의료 follow-up 근거만 사용해서 질문에 답하라.',
+      '다음 chunk 근거만 사용해서 질문에 답하라.',
       '근거가 부족하면 부족하다고 말하라.',
       '',
       `질문: ${state.question}`,
@@ -83,14 +61,18 @@ async function main() {
   workflow.addEdge('generateAnswer', END);
 
   const app = workflow.compile();
-  const question = '당뇨와 고혈압 환자에서 공통적으로 보이는 관리 문제는 무엇인가?';
+  const question = '복약 순응도와 추적 관찰 지연이 함께 나타나는 패턴은 무엇인가?';
   const result = await app.invoke({ question, topK: 4 });
 
-  console.log('\n=== EMBEDDING DEMO QUESTION ===\n');
+  console.log('\n=== VECTOR STORE DEMO ===\n');
+  console.log(`provider=${provider}`);
+  console.log(`loaded_docs=${docs.length}`);
+  console.log(`chunk_count=${chunks.length}`);
+  console.log('\n=== QUESTION ===\n');
   console.log(question);
-  console.log('\n=== RETRIEVED DOCS ===\n');
+  console.log('\n=== RETRIEVED CHUNKS ===\n');
   for (const doc of result.docs) {
-    console.log(`- score=${doc.score.toFixed(4)} source=${doc.source}`);
+    console.log(`- score=${doc.score.toFixed(4)} source=${doc.source} chunk=${doc.chunkIndex} chars=${doc.chunkChars}`);
   }
   console.log('\n=== ANSWER ===\n');
   console.log(result.answer);

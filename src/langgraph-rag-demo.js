@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { StateGraph, END } from '@langchain/langgraph';
 
-import { loadPdfDocuments, loadDbDocuments } from './lib/loaders.js';
+import { loadSourceDocuments, loadDbDocuments } from './lib/loaders.js';
 import { buildSparseIndex, retrieve } from './lib/retriever.js';
 import { createChatModel } from './lib/model.js';
 
@@ -12,8 +12,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
 
-// 강의에서는 PDF와 DB를 둘 다 하나의 지식 베이스로 합친다는 점이 중요하다.
-const pdfDir = path.join(ROOT, 'data', 'pdfs');
+// 강의에서는 문서 파일과 DB를 둘 다 하나의 지식 베이스로 합친다는 점이 중요하다.
+const sourceDir = path.join(ROOT, 'data');
 const dbPath = path.join(ROOT, 'data', 'sample.db');
 
 // 1) 먼저 로컬 데이터 소스를 모두 읽는다.
@@ -21,9 +21,9 @@ const dbPath = path.join(ROOT, 'data', 'sample.db');
 // 3) 가장 단순한 sparse index를 만든다.
 // 실제 서비스라면 여기를 벡터스토어/임베딩 기반으로 바꿀 수 있다.
 async function loadKnowledgeBase() {
-  const pdfDocs = await loadPdfDocuments(pdfDir);
+  const fileDocs = await loadSourceDocuments(sourceDir);
   const dbDocs = loadDbDocuments(dbPath);
-  return buildSparseIndex([...pdfDocs, ...dbDocs]);
+  return buildSparseIndex([...fileDocs, ...dbDocs]);
 }
 
 // LangGraph에서 사용할 상태(state)의 모양을 채널 개념으로 적어둔다.
@@ -54,7 +54,7 @@ async function main() {
   // answer 노드:
   // retrieve 단계에서 찾은 문서를 컨텍스트로 묶고,
   // 실제 LLM(OpenAI 또는 Ollama)에게 답변을 생성하게 한다.
-  workflow.addNode('answer', async (state) => {
+  workflow.addNode('generateAnswer', async (state) => {
     const context = state.docs
       .map((doc, i) => `[${i + 1}] (${doc.source})\n${doc.text.slice(0, 400)}`)
       .join('\n\n');
@@ -82,8 +82,8 @@ async function main() {
 
   // 그래프 시작점과 종료 경로를 연결한다.
   workflow.setEntryPoint('retrieve');
-  workflow.addEdge('retrieve', 'answer');
-  workflow.addEdge('answer', END);
+  workflow.addEdge('retrieve', 'generateAnswer');
+  workflow.addEdge('generateAnswer', END);
 
   // compile() 하면 실행 가능한 앱 객체가 된다.
   const app = workflow.compile();

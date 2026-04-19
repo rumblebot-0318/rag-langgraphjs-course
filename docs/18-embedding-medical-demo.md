@@ -19,13 +19,29 @@
 - 파일: `src/langgraph-rag-embedding-demo.js`
 - 실행: `npm run rag:demo:embed`
 
+chunk + vector store 기반 예시는 아래를 보면 된다.
+- 파일: `src/langgraph-rag-vectorstore-demo.js`
+- 실행: `npm run rag:demo:vector`
+
 ## 동작 방식
 
-1. PDF와 DB 문서를 읽는다
+1. 텍스트 샘플 문서와 DB 문서를 읽는다
 2. 각 문서를 임베딩 벡터로 바꾼다
 3. 질문도 임베딩 벡터로 바꾼다
 4. cosine similarity로 상위 문서를 찾는다
 5. 찾은 문서를 근거로 모델이 답한다
+
+## chunk + vector store 버전은 무엇이 다른가?
+
+기존 임베딩 데모는 문서 단위 임베딩 후 직접 cosine similarity를 계산한다.
+
+vector store 버전은:
+1. 문서를 chunk로 나눈다
+2. chunk를 vector store에 저장한다
+3. 질문으로 chunk 검색을 수행한다
+4. 검색된 chunk를 answer 단계에 전달한다
+
+즉, 더 실무적인 구조는 `rag:demo:vector` 쪽에 가깝다.
 
 ## 추천 임베딩 모델
 

@@ -8,6 +8,7 @@
     "dev": "node src/demo.js",
     "rag:demo": "node src/langgraph-rag-demo.js",
     "rag:demo:embed": "node src/langgraph-rag-embedding-demo.js",
+    "rag:demo:vector": "node src/langgraph-rag-vectorstore-demo.js",
     "rag:api": "node src/api-server.js",
     "db:sample": "node scripts/create-sample-db.js",
     "mcp:server": "node mcp/patient-mcp-server.js"
@@ -15,13 +16,14 @@
   "dependencies": {
     "@langchain/community": "^0.3.42",
     "@langchain/core": "^0.3.66",
-    "@langchain/openai": "^0.6.2",
-    "@langchain/ollama": "^0.2.0",
-    "@langchain/textsplitters": "^0.1.0",
     "@langchain/langgraph": "^0.2.39",
+    "@langchain/ollama": "^0.2.0",
+    "@langchain/openai": "^0.6.2",
+    "@langchain/textsplitters": "^0.1.0",
     "@modelcontextprotocol/sdk": "^1.12.1",
     "better-sqlite3": "^11.10.0",
     "dotenv": "^16.4.5",
+    "langchain": "^0.3.37",
     "pdf-parse": "^1.1.1",
     "zod": "^3.24.1"
   }

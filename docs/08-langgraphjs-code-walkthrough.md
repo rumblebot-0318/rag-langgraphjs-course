@@ -6,8 +6,8 @@
 
 ## 이 예제가 보여주는 것
 
-1. PDF와 DB에서 문서를 읽는다
-2. sample.db 와 sample PDF를 이용해 바로 실습할 수 있다
+1. 문서 파일과 DB에서 문서를 읽는다
+2. `sample.db` 와 `sample-report.txt`를 이용해 바로 실습할 수 있다
 3. 간단한 sparse retriever를 만든다
 4. LangGraph.js로 retrieve → answer 흐름을 만든다
 5. 필요하면 임베딩 모델 계층을 추가해 semantic search로 확장할 수 있다

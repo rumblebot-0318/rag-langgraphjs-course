@@ -60,3 +60,16 @@ RAG에서 검색 품질은 매우 중요하다.
 - 처음엔 sparse 검색으로 원리를 이해하고
 - 그 다음 임베딩을 보면 검색 품질 차이를 느끼기 좋다
 - 즉, 임베딩은 RAG를 더 실무적으로 만들어주는 핵심 부품 중 하나다
+
+## chunk와 vector store
+
+실무에서는 문서를 통째로 넣기보다 chunk로 잘라서 vector store에 저장하는 경우가 많다.
+
+이유:
+- 질문과 가까운 문맥만 더 정확히 찾기 쉽다
+- 긴 문서 전체를 한 번에 검색하는 것보다 노이즈가 줄어든다
+- 검색 결과를 answer 단계의 근거로 쓰기 편하다
+
+이 레포에서는 `MemoryVectorStore` 기반 예시를 추가해 두었다.
+- 실행: `npm run rag:demo:vector`
+- 설명: `docs/19-chunk-vector-store-guide.md`

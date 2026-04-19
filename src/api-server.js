@@ -5,16 +5,17 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { StateGraph, END } from '@langchain/langgraph';
-import { loadPdfDocuments, loadDbDocuments } from './lib/loaders.js';
+import { loadKnowledgeDocuments } from './lib/loaders.js';
 import { buildSparseIndex, retrieve } from './lib/retriever.js';
 import { createChatModel } from './lib/model.js';
 import { summarizeMedicalDocs } from './lib/medical-analysis.js';
+import { buildChunkedVectorStore, searchChunkedVectorStore } from './lib/vector-store.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
 
-const pdfDir = path.join(ROOT, 'data', 'pdfs');
+const sourceDir = path.join(ROOT, 'data');
 const dbPath = path.join(ROOT, 'data', 'sample.db');
 const publicDir = path.join(ROOT, 'public');
 
@@ -29,9 +30,25 @@ const GraphState = {
 };
 
 async function buildIndex() {
-  const pdfDocs = await loadPdfDocuments(pdfDir);
-  const dbDocs = loadDbDocuments(dbPath);
-  return buildSparseIndex([...pdfDocs, ...dbDocs]);
+  return buildSparseIndex(await loadKnowledgeDocuments(sourceDir, dbPath));
+}
+
+const vectorStoreCache = new Map();
+
+async function getVectorStoreForProvider(provider, embedModel) {
+  const cacheKey = `${provider}:${embedModel || 'default'}`;
+
+  if (!vectorStoreCache.has(cacheKey)) {
+    const docs = await loadKnowledgeDocuments(sourceDir, dbPath);
+    const buildPromise = buildChunkedVectorStore(docs, { provider, embedModel })
+      .catch((error) => {
+        vectorStoreCache.delete(cacheKey);
+        throw error;
+      });
+    vectorStoreCache.set(cacheKey, buildPromise);
+  }
+
+  return vectorStoreCache.get(cacheKey);
 }
 
 function sendJson(res, status, payload) {
@@ -71,6 +88,8 @@ const server = http.createServer(async (req, res) => {
         const topK = Number(parsed.topK || 4);
         const provider = parsed.provider || process.env.MODEL_PROVIDER || 'openai';
         const model = parsed.model || undefined;
+        const embedModel = parsed.embedModel || undefined;
+        const retrievalMode = parsed.retrievalMode || 'sparse';
         const temperature = typeof parsed.temperature === 'number'
           ? parsed.temperature
           : Number(parsed.temperature || process.env.TEMPERATURE || 0);
@@ -80,11 +99,19 @@ const server = http.createServer(async (req, res) => {
         const workflow = new StateGraph({ channels: GraphState });
 
         workflow.addNode('retrieve', async (state) => {
-          const docs = retrieve(index, state.question, state.topK || 4);
+          let docs;
+
+          if (retrievalMode === 'vector_chunks') {
+            const { vectorStore } = await getVectorStoreForProvider(provider, embedModel);
+            docs = await searchChunkedVectorStore(vectorStore, state.question, state.topK || 4);
+          } else {
+            docs = retrieve(index, state.question, state.topK || 4);
+          }
+
           return { docs };
         });
 
-        workflow.addNode('answer', async (state) => {
+        workflow.addNode('generateAnswer', async (state) => {
           const context = state.docs
             .map((doc, i) => `[${i + 1}] (${doc.source})\n${doc.text.slice(0, 400)}`)
             .join('\n\n');
@@ -113,8 +140,8 @@ const server = http.createServer(async (req, res) => {
         });
 
         workflow.setEntryPoint('retrieve');
-        workflow.addEdge('retrieve', 'answer');
-        workflow.addEdge('answer', END);
+        workflow.addEdge('retrieve', 'generateAnswer');
+        workflow.addEdge('generateAnswer', END);
 
         const app = workflow.compile();
         const result = await app.invoke({ question, topK, provider, model, temperature });
@@ -123,7 +150,9 @@ const server = http.createServer(async (req, res) => {
           question,
           topK,
           provider,
+          retrievalMode,
           model: model || (provider === 'ollama' ? process.env.OLLAMA_MODEL : process.env.OPENAI_MODEL),
+          embedModel: embedModel || (provider === 'ollama' ? process.env.OLLAMA_EMBED_MODEL : process.env.OPENAI_EMBED_MODEL),
           temperature,
           answer: result.answer,
           docs: result.docs,

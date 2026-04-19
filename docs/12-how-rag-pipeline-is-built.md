@@ -18,11 +18,11 @@
 
 데모는 두 종류의 데이터를 사용한다.
 
-- PDF 문서
+- 문서 파일
 - SQLite DB row
 
 이 프로젝트에서는:
-- `data/sample-report.pdf`
+- `data/sample-report.txt`
 - `data/sample.db`
 를 사용한다.
 
@@ -33,9 +33,9 @@
 
 `src/lib/loaders.js`에서 두 작업을 한다.
 
-### PDF 로드
-- PDF 파일을 읽는다
-- 텍스트를 추출한다
+### 문서 파일 로드
+- 기본 샘플에서는 TXT 파일을 읽는다
+- 필요하면 같은 로더로 PDF도 읽을 수 있다
 - 공백을 정리한다
 - 문서 객체로 만든다
 
@@ -45,7 +45,7 @@
 - row 하나를 하나의 문서처럼 다룬다
 
 즉, 이 단계가 끝나면
-PDF 문서와 DB row가 모두 비슷한 형태의 문서 배열이 된다.
+문서 파일과 DB row가 모두 비슷한 형태의 문서 배열이 된다.
 
 ## 3. 검색 인덱스 준비
 
@@ -124,4 +124,4 @@ OpenAI 또는 Ollama 모델을 호출한다.
 ## 한 줄 정리
 
 이 데모의 핵심은:
-**PDF와 DB를 하나의 지식 집합으로 묶고, LangGraph.js로 retrieve -> answer 흐름을 만든다**는 점이다.
+**문서 파일과 DB를 하나의 지식 집합으로 묶고, LangGraph.js로 retrieve -> answer 흐름을 만든다**는 점이다.
