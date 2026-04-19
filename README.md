@@ -113,8 +113,15 @@ npm run rag:demo
 - `data/sample.db` 읽기
 - PDF와 DB row를 하나의 검색 대상으로 합치기
 - 질문과 관련된 문서 찾기
+- 의료 follow-up 관찰 요약 생성
 - LangGraph.js 그래프로 `retrieve -> answer` 실행
 - OpenAI 또는 Ollama 모델로 최종 답변 생성
+
+임베딩 버전은 아래 명령으로 실행할 수 있다.
+
+```bash
+npm run rag:demo:embed
+```
 
 이 과정을 더 자세히 보고 싶으면 아래 문서를 보면 된다.
 - `docs/12-how-rag-pipeline-is-built.md`
@@ -210,6 +217,21 @@ npm run mcp:server
 
 MCP 예시 서버는 `sample.db`를 읽어서 patient note 조회용 tool을 제공한다.
 
+### 9. Docker로 바로 띄우기
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+더 자세한 내용은 아래 문서를 보면 된다.
+- `docs/16-docker-quickstart.md`
+
+## 의료 질문 예시
+
+의료 샘플 질문은 아래 문서에 모아두었다.
+- `docs/17-medical-question-examples.md`
+
 ## API 확인 포인트
 
 API 모드에서는 아래를 확인하면 된다.
@@ -241,6 +263,8 @@ API 모드에서는 아래를 확인하면 된다.
 - `docs/13-api-usage.md`
 - `docs/14-mcp-server-guide.md`
 - `docs/15-how-to-build-an-mcp-server.md`
+- `docs/16-docker-quickstart.md`
+- `docs/17-medical-question-examples.md`
 
 ## 예제 코드
 
@@ -250,6 +274,8 @@ API 모드에서는 아래를 확인하면 된다.
 - `src/lib/retriever.js`
 - `src/lib/model.js`
 - `src/lib/embeddings.js`
+- `src/lib/medical-analysis.js`
+- `src/langgraph-rag-embedding-demo.js`
 - `scripts/create-sample-db.js`
 - `mcp/patient-mcp-server.js`
 
@@ -259,6 +285,7 @@ API 모드에서는 아래를 확인하면 된다.
 npm install
 npm run db:sample
 npm run rag:demo
+npm run rag:demo:embed
 ```
 
 ## 샘플 데이터

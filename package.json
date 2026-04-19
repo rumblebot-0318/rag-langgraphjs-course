@@ -7,6 +7,7 @@
     "start": "node src/demo.js",
     "dev": "node src/demo.js",
     "rag:demo": "node src/langgraph-rag-demo.js",
+    "rag:demo:embed": "node src/langgraph-rag-embedding-demo.js",
     "rag:api": "node src/api-server.js",
     "db:sample": "node scripts/create-sample-db.js",
     "mcp:server": "node mcp/patient-mcp-server.js"

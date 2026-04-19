@@ -8,6 +8,7 @@ import { StateGraph, END } from '@langchain/langgraph';
 import { loadPdfDocuments, loadDbDocuments } from './lib/loaders.js';
 import { buildSparseIndex, retrieve } from './lib/retriever.js';
 import { createChatModel } from './lib/model.js';
+import { summarizeMedicalDocs } from './lib/medical-analysis.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -88,19 +89,25 @@ const server = http.createServer(async (req, res) => {
             .map((doc, i) => `[${i + 1}] (${doc.source})\n${doc.text.slice(0, 400)}`)
             .join('\n\n');
 
+          const summary = summarizeMedicalDocs(state.question, state.docs);
+
           const prompt = [
-            '다음 근거만 사용해서 질문에 답하라.',
+            '다음 의료 follow-up 근거와 관찰 요약만 사용해서 질문에 답하라.',
             '근거가 부족하면 부족하다고 말하라.',
             '',
             `질문: ${state.question}`,
+            '',
+            `관찰 요약:\n${summary}`,
             '',
             `근거:\n${context}`,
           ].join('\n');
 
           const response = await chatModel.invoke(prompt);
-          const answer = typeof response.content === 'string'
+          const modelAnswer = typeof response.content === 'string'
             ? response.content
             : JSON.stringify(response.content);
+
+          const answer = `${summary}\n\n모델 응답:\n${modelAnswer}`;
 
           return { answer };
         });
