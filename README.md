@@ -1,0 +1,81 @@
+# RAG LangGraph.js Course Starter
+
+LangGraph.js 기반으로 RAG를 설명하고 실습할 수 있게 만든 **신규 강의용 레포**입니다.
+
+핵심 목표:
+- LangGraph.js로 RAG 흐름 이해하기
+- PDF + DB(SQLite) 데이터를 함께 다루기
+- Ollama / OpenAI(GPT) 두 가지 모델 경로 모두 설명하기
+- 교보재처럼 구조와 원리를 문서화하기
+
+## 포함 내용
+
+- LangGraph.js 개념 설명
+- OpenAI API 키 발급 가이드
+- Ollama 설치 및 모델 사용 가이드
+- PDF/DB RAG 구조 설명
+- 강의용 슬라이드 초안
+- JS 프로젝트 구조 예시
+
+## 추천 대상
+
+- RAG를 처음 배우는 사람
+- LangGraph.js로 워크플로를 짜보고 싶은 사람
+- Ollama와 GPT를 둘 다 비교해서 설명해야 하는 사람
+
+## 빠른 시작
+
+```bash
+cd rag-langgraphjs-course
+npm install
+```
+
+## 강의 자료
+
+- `docs/01-rag-basics.md`
+- `docs/02-openai-api-guide.md`
+- `docs/03-ollama-guide.md`
+- `docs/04-langgraphjs-guide.md`
+- `docs/05-pdf-db-rag-guide.md`
+- `docs/06-implementation-notes.md`
+- `docs/07-repo-setup-guide.md`
+- `slides/lecture-outline.md`
+
+## 예제 코드
+
+- `src/langgraph-rag-demo.js`
+- `src/lib/loaders.js`
+- `src/lib/retriever.js`
+- `src/lib/model.js`
+
+실행 예시:
+
+```bash
+npm install
+npm run rag:demo
+```
+
+## 레포 목적
+
+이 레포는 당장 완성품 앱보다, **수업/설명/입문 실습**에 초점을 둔다.
+필요하면 이걸 바탕으로 실제 앱 구현 레포로 확장하면 된다.
+
+## 모델 전환 방식
+
+`.env`에서 공급자를 바꿔서 설명할 수 있다.
+
+### OpenAI 예시
+
+```env
+MODEL_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4.1-mini
+```
+
+### Ollama 예시
+
+```env
+MODEL_PROVIDER=ollama
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=qwen2.5:3b
+```

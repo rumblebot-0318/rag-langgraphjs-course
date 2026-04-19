@@ -1,0 +1,23 @@
+{
+  "name": "rag-langgraphjs-course",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/demo.js",
+    "dev": "node src/demo.js",
+    "rag:demo": "node src/langgraph-rag-demo.js",
+    "db:sample": "node scripts/create-sample-db.js"
+  },
+  "dependencies": {
+    "@langchain/community": "^0.3.42",
+    "@langchain/core": "^0.3.66",
+    "@langchain/openai": "^0.6.2",
+    "@langchain/ollama": "^0.2.0",
+    "@langchain/textsplitters": "^0.1.0",
+    "@langchain/langgraph": "^0.2.39",
+    "better-sqlite3": "^11.10.0",
+    "dotenv": "^16.4.5",
+    "pdf-parse": "^1.1.1"
+  }
+}
