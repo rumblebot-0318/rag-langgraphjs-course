@@ -38,10 +38,10 @@ npm install
 - `docs/04-langgraphjs-guide.md`
 - `docs/05-pdf-db-rag-guide.md`
 - `docs/06-implementation-notes.md`
-- `docs/07-repo-setup-guide.md`
 - `docs/08-langgraphjs-code-walkthrough.md`
 - `docs/09-embeddings-guide.md`
 - `docs/10-embedding-models.md`
+- `docs/11-sparse-vs-embedding.md`
 - `slides/lecture-outline.md`
 
 ## 예제 코드
@@ -77,6 +77,7 @@ npm run rag:demo
 ## 레포 목적
 
 이 레포는 당장 완성품 앱보다, **수업/설명/입문 실습**에 초점을 둔다.
+문서를 처음 읽는 사람이 헷갈리지 않도록 개념 설명을 쉬운 말로 풀어두는 방향을 우선했다.
 필요하면 이걸 바탕으로 실제 앱 구현 레포로 확장하면 된다.
 
 ## 모델 전환 방식
