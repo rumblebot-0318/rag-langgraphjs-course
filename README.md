@@ -47,13 +47,24 @@ npm install
 - `src/lib/loaders.js`
 - `src/lib/retriever.js`
 - `src/lib/model.js`
+- `scripts/create-sample-db.js`
 
 실행 예시:
 
 ```bash
 npm install
+npm run db:sample
 npm run rag:demo
 ```
+
+## 샘플 데이터
+
+- `data/sample.db` : 샘플 SQLite DB
+- `data/sample-report.pdf` : 강의용 샘플 PDF
+- `data/sample-report.txt` : PDF에 들어간 내용 참고본
+
+강의할 때는 이 샘플 파일로 바로 retrieval 흐름을 보여준 뒤,
+실제 업무 PDF와 DB로 교체하는 식으로 진행하면 된다.
 
 ## 레포 목적
 
