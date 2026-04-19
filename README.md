@@ -139,14 +139,50 @@ curl http://127.0.0.1:3000/health
 curl http://127.0.0.1:3000/ask \
   -H 'Content-Type: application/json' \
   -d '{
-    "question": "최근 고객 문의에서 반복되는 주제와 매출이 높은 고객 특징은?"
+    "question": "환자 추적 관찰에서 반복되는 위험 신호는 무엇인가?",
+    "topK": 4,
+    "provider": "ollama",
+    "model": "qwen2.5:3b",
+    "temperature": 0.2
   }'
+```
+
+#### 브라우저로 보기
+
+서버를 띄운 뒤 아래 주소로 들어가면 간단한 테스트 페이지도 볼 수 있다.
+
+```text
+http://127.0.0.1:3000/
 ```
 
 응답에는 다음이 들어간다.
 - 질문
+- topK
+- provider
+- model
+- temperature
 - 생성된 답변
 - retrieval된 문서 목록
+
+#### 응답 예시
+
+```json
+{
+  "question": "환자 추적 관찰에서 반복되는 위험 신호는 무엇인가?",
+  "topK": 4,
+  "provider": "ollama",
+  "model": "qwen2.5:3b",
+  "temperature": 0.2,
+  "answer": "반복적으로 보이는 위험 신호는 복약 순응도 저하, 추적 관찰 지연, 만성질환 중복 관리 필요성이다.",
+  "docs": [
+    {
+      "source": "db://patient_notes/0",
+      "score": 0.42,
+      "text": "환자명: Kim Minseo ..."
+    }
+  ]
+}
+```
 
 ### 8. 만약 바로 실행이 안 되면
 
@@ -171,7 +207,8 @@ curl http://127.0.0.1:3000/ask \
 API 모드에서는 아래를 확인하면 된다.
 - `/health`가 정상 응답하는가
 - `/ask`에 질문을 보내면 JSON이 오는가
-- 응답에 `answer`와 `docs`가 들어있는가
+- 응답에 `answer`, `docs`, `provider`, `model`, `temperature`가 들어있는가
+- `topK` 값을 바꿨을 때 retrieval 결과 수가 달라지는가
 
 ## 확인 포인트
 
@@ -213,8 +250,8 @@ npm run rag:demo
 
 ## 샘플 데이터
 
-- `data/sample.db` : 샘플 SQLite DB
-- `data/sample-report.pdf` : 샘플 PDF
+- `data/sample.db` : 의료 환자 추적 관찰 샘플 SQLite DB
+- `data/sample-report.pdf` : 의료 운영 요약 샘플 PDF
 - `data/sample-report.md` : PDF 원문에 해당하는 markdown 버전
 - `data/sample-report.txt` : PDF에 들어간 내용 참고본
 

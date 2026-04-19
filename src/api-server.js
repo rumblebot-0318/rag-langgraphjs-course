@@ -20,50 +20,17 @@ const publicDir = path.join(ROOT, 'public');
 const GraphState = {
   question: 'string',
   topK: 'number',
+  provider: 'string',
+  model: 'string',
+  temperature: 'number',
   docs: 'array',
   answer: 'string',
 };
 
-async function buildApp() {
+async function buildIndex() {
   const pdfDocs = await loadPdfDocuments(pdfDir);
   const dbDocs = loadDbDocuments(dbPath);
-  const index = buildSparseIndex([...pdfDocs, ...dbDocs]);
-  const model = createChatModel();
-
-  const workflow = new StateGraph({ channels: GraphState });
-
-  workflow.addNode('retrieve', async (state) => {
-    const docs = retrieve(index, state.question, state.topK || 4);
-    return { docs };
-  });
-
-  workflow.addNode('answer', async (state) => {
-    const context = state.docs
-      .map((doc, i) => `[${i + 1}] (${doc.source})\n${doc.text.slice(0, 400)}`)
-      .join('\n\n');
-
-    const prompt = [
-      '다음 근거만 사용해서 질문에 답하라.',
-      '근거가 부족하면 부족하다고 말하라.',
-      '',
-      `질문: ${state.question}`,
-      '',
-      `근거:\n${context}`,
-    ].join('\n');
-
-    const response = await model.invoke(prompt);
-    const answer = typeof response.content === 'string'
-      ? response.content
-      : JSON.stringify(response.content);
-
-    return { answer };
-  });
-
-  workflow.setEntryPoint('retrieve');
-  workflow.addEdge('retrieve', 'answer');
-  workflow.addEdge('answer', END);
-
-  return workflow.compile();
+  return buildSparseIndex([...pdfDocs, ...dbDocs]);
 }
 
 function sendJson(res, status, payload) {
@@ -75,7 +42,7 @@ function sendJson(res, status, payload) {
   res.end(data);
 }
 
-const app = await buildApp();
+const index = await buildIndex();
 
 const server = http.createServer(async (req, res) => {
   if (req.method === 'GET' && req.url === '/') {
@@ -99,13 +66,58 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       try {
         const parsed = body ? JSON.parse(body) : {};
-        const question = parsed.question || '최근 고객 문의에서 반복되는 주제와 매출이 높은 고객 특징은?';
+        const question = parsed.question || '환자 추적 관찰에서 반복되는 위험 신호는 무엇인가?';
         const topK = Number(parsed.topK || 4);
+        const provider = parsed.provider || process.env.MODEL_PROVIDER || 'openai';
+        const model = parsed.model || undefined;
+        const temperature = typeof parsed.temperature === 'number'
+          ? parsed.temperature
+          : Number(parsed.temperature || process.env.TEMPERATURE || 0);
 
-        const result = await app.invoke({ question, topK });
+        const chatModel = createChatModel({ provider, model, temperature });
+
+        const workflow = new StateGraph({ channels: GraphState });
+
+        workflow.addNode('retrieve', async (state) => {
+          const docs = retrieve(index, state.question, state.topK || 4);
+          return { docs };
+        });
+
+        workflow.addNode('answer', async (state) => {
+          const context = state.docs
+            .map((doc, i) => `[${i + 1}] (${doc.source})\n${doc.text.slice(0, 400)}`)
+            .join('\n\n');
+
+          const prompt = [
+            '다음 근거만 사용해서 질문에 답하라.',
+            '근거가 부족하면 부족하다고 말하라.',
+            '',
+            `질문: ${state.question}`,
+            '',
+            `근거:\n${context}`,
+          ].join('\n');
+
+          const response = await chatModel.invoke(prompt);
+          const answer = typeof response.content === 'string'
+            ? response.content
+            : JSON.stringify(response.content);
+
+          return { answer };
+        });
+
+        workflow.setEntryPoint('retrieve');
+        workflow.addEdge('retrieve', 'answer');
+        workflow.addEdge('answer', END);
+
+        const app = workflow.compile();
+        const result = await app.invoke({ question, topK, provider, model, temperature });
+
         sendJson(res, 200, {
           question,
           topK,
+          provider,
+          model: model || (provider === 'ollama' ? process.env.OLLAMA_MODEL : process.env.OPENAI_MODEL),
+          temperature,
           answer: result.answer,
           docs: result.docs,
         });

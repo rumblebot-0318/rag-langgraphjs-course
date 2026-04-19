@@ -12,28 +12,29 @@ fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 const db = new Database(dbPath);
 
 db.exec(`
-CREATE TABLE IF NOT EXISTS sales_notes (
+CREATE TABLE IF NOT EXISTS patient_notes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  customer_name TEXT NOT NULL,
-  segment TEXT NOT NULL,
-  revenue INTEGER NOT NULL,
-  inquiry_topic TEXT NOT NULL,
-  contract_status TEXT NOT NULL,
+  patient_name TEXT NOT NULL,
+  age INTEGER NOT NULL,
+  diagnosis TEXT NOT NULL,
+  medication_issue TEXT NOT NULL,
+  follow_up_status TEXT NOT NULL,
+  risk_level TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
-DELETE FROM sales_notes;
+DELETE FROM patient_notes;
 `);
 
 const insert = db.prepare(`
-INSERT INTO sales_notes (customer_name, segment, revenue, inquiry_topic, contract_status, created_at)
-VALUES (?, ?, ?, ?, ?, ?)
+INSERT INTO patient_notes (patient_name, age, diagnosis, medication_issue, follow_up_status, risk_level, created_at)
+VALUES (?, ?, ?, ?, ?, ?, ?)
 `);
 
 const rows = [
-  ['Alpha Tech', 'enterprise', 12000000, 'pricing, support scope', 'closed-won', '2026-03-02'],
-  ['Beta Commerce', 'smb', 4200000, 'deployment time, pricing', 'proposal', '2026-03-14'],
-  ['Gamma Health', 'enterprise', 9800000, 'security, support scope', 'closed-won', '2026-03-21'],
-  ['Delta Edu', 'mid-market', 6100000, 'pricing, customization', 'negotiation', '2026-03-28'],
+  ['Kim Minseo', 67, 'diabetes, hypertension', 'missed evening dose twice per week', 'follow-up delayed by 3 weeks', 'high', '2026-03-02'],
+  ['Lee Jihun', 58, 'hypertension', 'blood pressure medication adherence inconsistent', 'follow-up completed on time', 'medium', '2026-03-14'],
+  ['Park Sora', 72, 'diabetes, chronic kidney disease', 'glucose monitoring irregular', 'follow-up delayed by 2 weeks', 'high', '2026-03-21'],
+  ['Choi Yuna', 49, 'asthma', 'controller inhaler missed occasionally', 'follow-up scheduled', 'low', '2026-03-28'],
 ];
 
 for (const row of rows) insert.run(...row);

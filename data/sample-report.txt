@@ -1,13 +1,15 @@
-Quarterly Customer Analysis Report
+Clinical Operations Summary Report
 
-This document summarizes recent customer activity and sales trends.
-Enterprise customers showed stronger repurchase signals than smaller accounts.
-The most common inquiry topics were pricing, deployment time, and support scope.
-Customers with higher revenue tended to ask about security, integration, and long-term support.
-In later-stage negotiations, project timeline and maintenance coverage were frequent decision factors.
+This document summarizes outpatient care patterns and follow-up risks in a small medical operations setting.
 
-Key Teaching Points for RAG Demo
-1. PDF documents often contain qualitative context that is not in database tables.
-2. Database rows can be turned into short text documents for retrieval.
-3. Combining both sources makes it easier to explain why an answer was produced.
-4. A practical RAG pipeline should be able to show both the retrieved evidence and the final answer.
+Summary
+- Patients with diabetes and hypertension appeared frequently in follow-up scheduling records.
+- Common concerns included medication adherence, blood pressure control, glucose monitoring, and delayed revisit dates.
+- Older patients with multiple chronic conditions were more likely to require repeated follow-up.
+- Several notes suggested that missed appointments increased the risk of worsening symptom control.
+
+Observations
+1. Follow-up timing matters because delayed revisits can lead to unstable chronic disease management.
+2. Medication compliance is a recurring theme in both consultation notes and care planning.
+3. Patients with combined chronic conditions often need more detailed monitoring plans.
+4. A useful RAG pipeline should retrieve both narrative notes and structured patient records.
