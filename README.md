@@ -116,6 +116,9 @@ npm run rag:demo
 - LangGraph.js 그래프로 `retrieve -> answer` 실행
 - OpenAI 또는 Ollama 모델로 최종 답변 생성
 
+이 과정을 더 자세히 보고 싶으면 아래 문서를 보면 된다.
+- `docs/12-how-rag-pipeline-is-built.md`
+
 ### 7. 만약 바로 실행이 안 되면
 
 #### `better-sqlite3` 설치 오류
@@ -153,6 +156,7 @@ npm run rag:demo
 - `docs/09-embeddings-guide.md`
 - `docs/10-embedding-models.md`
 - `docs/11-sparse-vs-embedding.md`
+- `docs/12-how-rag-pipeline-is-built.md`
 
 ## 예제 코드
 
