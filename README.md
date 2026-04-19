@@ -119,7 +119,36 @@ npm run rag:demo
 이 과정을 더 자세히 보고 싶으면 아래 문서를 보면 된다.
 - `docs/12-how-rag-pipeline-is-built.md`
 
-### 7. 만약 바로 실행이 안 되면
+### 7. API 서버로 실행
+
+```bash
+npm run rag:api
+```
+
+기본 포트는 `3000`이다.
+
+#### health check
+
+```bash
+curl http://127.0.0.1:3000/health
+```
+
+#### 질문 보내기
+
+```bash
+curl http://127.0.0.1:3000/ask \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "question": "최근 고객 문의에서 반복되는 주제와 매출이 높은 고객 특징은?"
+  }'
+```
+
+응답에는 다음이 들어간다.
+- 질문
+- 생성된 답변
+- retrieval된 문서 목록
+
+### 8. 만약 바로 실행이 안 되면
 
 #### `better-sqlite3` 설치 오류
 환경에 따라 네이티브 빌드 이슈가 날 수 있다.
@@ -136,6 +165,13 @@ npm run rag:demo
 #### OpenAI 인증 실패
 - `OPENAI_API_KEY`가 올바른지 확인
 - 결제/사용량 제한이 걸려 있지 않은지 확인
+
+## API 확인 포인트
+
+API 모드에서는 아래를 확인하면 된다.
+- `/health`가 정상 응답하는가
+- `/ask`에 질문을 보내면 JSON이 오는가
+- 응답에 `answer`와 `docs`가 들어있는가
 
 ## 확인 포인트
 

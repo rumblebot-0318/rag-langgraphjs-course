@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import http from 'node:http';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -14,9 +15,11 @@ const ROOT = path.resolve(__dirname, '..');
 
 const pdfDir = path.join(ROOT, 'data', 'pdfs');
 const dbPath = path.join(ROOT, 'data', 'sample.db');
+const publicDir = path.join(ROOT, 'public');
 
 const GraphState = {
   question: 'string',
+  topK: 'number',
   docs: 'array',
   answer: 'string',
 };
@@ -30,7 +33,7 @@ async function buildApp() {
   const workflow = new StateGraph({ channels: GraphState });
 
   workflow.addNode('retrieve', async (state) => {
-    const docs = retrieve(index, state.question, 4);
+    const docs = retrieve(index, state.question, state.topK || 4);
     return { docs };
   });
 
@@ -75,6 +78,14 @@ function sendJson(res, status, payload) {
 const app = await buildApp();
 
 const server = http.createServer(async (req, res) => {
+  if (req.method === 'GET' && req.url === '/') {
+    const file = path.join(publicDir, 'index.html');
+    const html = fs.readFileSync(file, 'utf8');
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(html);
+    return;
+  }
+
   if (req.method === 'GET' && req.url === '/health') {
     return sendJson(res, 200, { ok: true });
   }
@@ -89,9 +100,12 @@ const server = http.createServer(async (req, res) => {
       try {
         const parsed = body ? JSON.parse(body) : {};
         const question = parsed.question || '최근 고객 문의에서 반복되는 주제와 매출이 높은 고객 특징은?';
-        const result = await app.invoke({ question });
+        const topK = Number(parsed.topK || 4);
+
+        const result = await app.invoke({ question, topK });
         sendJson(res, 200, {
           question,
+          topK,
           answer: result.answer,
           docs: result.docs,
         });

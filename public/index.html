@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAG LangGraph.js Demo</title>
+  <style>
+    body { font-family: Inter, system-ui, sans-serif; background:#f8fafc; color:#0f172a; margin:0; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 32px 20px; }
+    .card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px; margin-bottom:16px; }
+    textarea { width:100%; min-height:120px; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font:inherit; }
+    input { padding:10px; border:1px solid #cbd5e1; border-radius:8px; width:100px; }
+    button { background:#2563eb; color:#fff; border:0; border-radius:8px; padding:10px 14px; cursor:pointer; }
+    pre { white-space:pre-wrap; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; }
+    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:12px; }
+    .doc { border-top:1px solid #e2e8f0; margin-top:12px; padding-top:12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>RAG LangGraph.js Demo</h1>
+      <p>API 서버에 질문을 보내고 retrieval 결과와 answer를 확인하는 테스트 페이지</p>
+    </div>
+    <div class="card">
+      <label><strong>질문</strong></label>
+      <textarea id="question">최근 고객 문의에서 반복되는 주제와 매출이 높은 고객 특징은?</textarea>
+      <div class="row">
+        <label>topK <input id="topK" type="number" min="1" max="10" value="4" /></label>
+        <button id="askBtn">질문 보내기</button>
+      </div>
+    </div>
+    <div class="card">
+      <strong>응답</strong>
+      <pre id="answer">아직 응답 없음</pre>
+    </div>
+    <div class="card">
+      <strong>검색된 문서</strong>
+      <div id="docs">아직 결과 없음</div>
+    </div>
+  </div>
+  <script>
+    const askBtn = document.getElementById('askBtn');
+    const answerEl = document.getElementById('answer');
+    const docsEl = document.getElementById('docs');
+    askBtn.onclick = async () => {
+      const question = document.getElementById('question').value;
+      const topK = Number(document.getElementById('topK').value || 4);
+      answerEl.textContent = '요청 중...';
+      docsEl.innerHTML = '';
+      const res = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, topK })
+      });
+      const data = await res.json();
+      answerEl.textContent = JSON.stringify({ question: data.question, topK: data.topK, answer: data.answer }, null, 2);
+      docsEl.innerHTML = (data.docs || []).map((doc, i) => `<div class="doc"><div><strong>${i+1}. ${doc.source}</strong> (score=${doc.score.toFixed(4)})</div><div>${String(doc.text).slice(0,300)}</div></div>`).join('');
+    };
+  </script>
+</body>
+</html>
